@@ -66,10 +66,6 @@ public class ResizeGesture extends GestureDetector.SimpleOnGestureListener {
         mMinWidth = minWidth;
     }
 
-    public void setResizeEnabled(boolean enabled) {
-        mResizerView.setVisibility(enabled ? View.VISIBLE : View.GONE);
-    }
-
     @Override
     public boolean onDown(MotionEvent event) {
         initialTouchX = event.getRawX();

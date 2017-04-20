@@ -12,7 +12,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
 
 import com.stardust.enhancedfloaty.gesture.DragGesture;
 import com.stardust.enhancedfloaty.gesture.ResizeGesture;
@@ -27,21 +26,14 @@ import java.io.Serializable;
 
 public class ResizableFloatyService extends Service {
 
-    public interface ViewSupplier extends Serializable {
-
-        View inflateCollapsedView(Context context);
-
-        View inflateExpandedView(Context context);
-
-        View getResizerView(View expandedView);
-    }
-
     private static final String EXTRA_VIEW_SUPPLIER = "Eating, still love you 17.4.18";
     private static final int INITIAL_WINDOW_PARAM_FLAG = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
-    public static void startService(Context context, ViewSupplier supplier) {
-        context.startService(new Intent(context, ResizableFloatyService.class)
-                .putExtra(EXTRA_VIEW_SUPPLIER, supplier));
+    private static ResizableFloaty floaty;
+
+    public static void startService(Context context, ResizableFloaty floaty) {
+        ResizableFloatyService.floaty = floaty;
+        context.startService(new Intent(context, ResizableFloatyService.class));
     }
 
     private WindowManager mWindowManager;
@@ -51,8 +43,12 @@ public class ResizableFloatyService extends Service {
     private View mCollapsedView;
     private View mExpandedView;
     private View mResizer;
+    private View mMoveCursor;
     private ResizeGesture mResizeGesture;
     private DragGesture mDragGesture;
+    private int mCollapsedViewX, mCollapsedViewY;
+    private int mExpandedViewX, mExpandedViewY;
+
     private ViewStack mViewStack = new ViewStack(new ViewStack.CurrentViewSetter() {
         @Override
         public void setCurrentView(View v) {
@@ -78,6 +74,13 @@ public class ResizableFloatyService extends Service {
             mWindowLayoutParams.x = x;
             mWindowLayoutParams.y = y;
             mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
+            if (mCollapseExpandViewSwitcher.getCurrentView() == mExpandedView) {
+                mExpandedViewX = x;
+                mExpandedViewY = y;
+            }else {
+                mCollapsedViewX = x;
+                mCollapsedViewY = y;
+            }
         }
 
         @Override
@@ -119,25 +122,20 @@ public class ResizableFloatyService extends Service {
 
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        ViewSupplier supplier = (ViewSupplier) intent.getSerializableExtra(EXTRA_VIEW_SUPPLIER);
-        if (supplier == null) {
-            throw new IllegalStateException("Must start this service by static method ResizableFloatyService.startService");
-        }
-        mExpandedView = supplier.inflateExpandedView(this);
-        mCollapsedView = supplier.inflateCollapsedView(this);
-        mResizer = supplier.getResizerView(mExpandedView);
-        initWindowView();
-        initGesture();
-        setKeyListener();
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
     public void onCreate() {
         super.onCreate();
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowLayoutParams = createWindowLayoutParams();
+        if (floaty == null) {
+            throw new IllegalStateException("Must start this service by static method ResizableFloatyService.startService");
+        }
+        mExpandedView = floaty.inflateExpandedView(this);
+        mCollapsedView = floaty.inflateCollapsedView(this);
+        mResizer = floaty.getResizerView(mExpandedView);
+        mMoveCursor = floaty.getMoveCursorView(mExpandedView);
+        initWindowView();
+        initGesture();
+        setKeyListener();
     }
 
     private WindowManager.LayoutParams createWindowLayoutParams() {
@@ -164,14 +162,19 @@ public class ResizableFloatyService extends Service {
     }
 
     private void initGesture() {
-        mResizeGesture = ResizeGesture.enableResize(mResizer, mExpandedView, mWindowBridge);
-        mDragGesture = DragGesture.enableDrag(mCollapsedView, mWindowBridge);
-        mResizeGesture.setResizeEnabled(false);
+        if (mResizer != null) {
+            mResizeGesture = ResizeGesture.enableResize(mResizer, mExpandedView, mWindowBridge);
+        }
+        if (mMoveCursor != null) {
+            DragGesture.enableDrag(mMoveCursor, mWindowBridge, 1.0f, 1.0f);
+        }
+        mDragGesture = DragGesture.enableDrag(mCollapsedView, mWindowBridge, floaty.getCollapsedViewPressedAlpha(), floaty.getCollapsedViewUnpressedAlpha());
         mDragGesture.setKeepToSide(true);
+        mDragGesture.setKeepToSideHiddenWidthRadio(floaty.getCollapsedHiddenWidthRadio());
         mDragGesture.setOnDraggedViewClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enableWindowFocus();
+                enableWindowFocusAndWindowLimit();
                 expand();
             }
         });
@@ -179,15 +182,15 @@ public class ResizableFloatyService extends Service {
 
     private void expand() {
         mCollapseExpandViewSwitcher.showSecond();
-        mResizeGesture.setResizeEnabled(true);
         mDragGesture.setKeepToSide(false);
+        mWindowBridge.updatePosition(mExpandedViewX, mExpandedViewY);
     }
 
     private void collapse() {
         mCollapseExpandViewSwitcher.showFirst();
-        disableWindowFocus();
-        mResizeGesture.setResizeEnabled(false);
+        disableWindowFocusAndWindowLimit();
         mDragGesture.setKeepToSide(true);
+        mWindowBridge.updatePosition(mCollapsedViewX, mCollapsedViewY);
     }
 
     private void setKeyListener() {
@@ -222,13 +225,14 @@ public class ResizableFloatyService extends Service {
         collapse();
     }
 
-    private void disableWindowFocus() {
+    private void disableWindowFocusAndWindowLimit() {
         mWindowLayoutParams.flags = INITIAL_WINDOW_PARAM_FLAG;
         mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
     }
 
-    private void enableWindowFocus() {
+    private void enableWindowFocusAndWindowLimit() {
         mWindowLayoutParams.flags &= ~WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        mWindowLayoutParams.flags &= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
         mWindowView.requestFocus();
     }
