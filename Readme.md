@@ -19,7 +19,7 @@ Add it in your root build.gradle at the end of repositories:
 #### Step 2. Add the dependency
 ```
     dependencies {
-            compile 'com.github.hyb1996:node-android-lib:1.0.14'
+            compile 'com.github.hyb1996:EnhancedFloaty:0.1'
     }
 ```
 
