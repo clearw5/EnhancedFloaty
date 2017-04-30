@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">EnhancedFloaty</string>
+    <string name="resizable_floaty">可调整大小悬浮窗</string>
+    <string name="expandable_floaty">可展开悬浮窗</string>
 </resources>
