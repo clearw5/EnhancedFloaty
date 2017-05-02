@@ -146,7 +146,7 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
         mCollapseExpandViewSwitcher.showSecond();
         //enableWindowLimit();
         if (mFloaty.shouldRequestFocusWhenExpand()) {
-            enableWindowFocus();
+            requestWindowFocus();
         }
         mDragGesture.setKeepToSide(false);
         mWindowBridge.updatePosition(mExpandedViewX, mExpandedViewY);
@@ -191,18 +191,18 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
         collapse();
     }
 
-    private void disableWindowFocusAndWindowLimit() {
+    public void disableWindowFocusAndWindowLimit() {
         mWindowLayoutParams.flags = INITIAL_WINDOW_PARAM_FLAG;
         mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
     }
 
-    private void enableWindowFocus() {
+    public void requestWindowFocus() {
         mWindowLayoutParams.flags &= ~WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
         mWindowView.requestFocus();
     }
 
-    private void enableWindowLimit() {
+    public void enableWindowLimit() {
         mWindowLayoutParams.flags &= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
     }

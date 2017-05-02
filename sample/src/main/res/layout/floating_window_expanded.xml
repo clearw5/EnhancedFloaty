@@ -63,6 +63,14 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="true"
+            android:lines="1"
+            android:imeOptions="actionDone"/>
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"

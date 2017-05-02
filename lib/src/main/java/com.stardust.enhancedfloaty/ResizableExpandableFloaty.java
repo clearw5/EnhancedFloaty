@@ -37,7 +37,7 @@ public interface ResizableExpandableFloaty {
 
     boolean isInitialExpanded();
 
-    abstract class AbstarctResizableExpandableFloaty implements ResizableExpandableFloaty {
+    abstract class AbstractResizableExpandableFloaty implements ResizableExpandableFloaty {
         private float mCollapsedHiddenWidthRadio = 0f;
         private float mCollapsedViewUnpressedAlpha = 0.7f;
         private float mCollapsedViewPressedAlpha = 1.0f;
