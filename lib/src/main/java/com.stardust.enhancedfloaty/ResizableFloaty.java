@@ -10,7 +10,7 @@ import android.view.View;
 public abstract class ResizableFloaty {
 
 
-    public abstract View inflateView(ResizableFloatyService service);
+    public abstract View inflateView(FloatyService floatyService, ResizableFloatyWindow service);
 
     @Nullable
     public View getResizerView(View view) {

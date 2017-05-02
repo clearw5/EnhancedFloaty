@@ -1,13 +1,13 @@
 package com.stardust.enhancedfloaty.sample;
 
-import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 
+import com.stardust.enhancedfloaty.FloatyService;
 import com.stardust.enhancedfloaty.R;
 import com.stardust.enhancedfloaty.ResizableFloaty;
-import com.stardust.enhancedfloaty.ResizableFloatyService;
+import com.stardust.enhancedfloaty.ResizableFloatyWindow;
 
 /**
  * Created by Stardust on 2017/4/30.
@@ -18,12 +18,12 @@ public class SampleFloaty extends ResizableFloaty {
     private View mMoveCursor;
 
     @Override
-    public View inflateView(final ResizableFloatyService service) {
+    public View inflateView(final FloatyService service, final ResizableFloatyWindow window) {
         View view = View.inflate(new ContextThemeWrapper(service, R.style.AppTheme), R.layout.floating_window_expanded, null);
         view.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                service.stopSelf();
+                window.close();
             }
         });
         view.findViewById(R.id.move_or_resize).setOnClickListener(new View.OnClickListener() {

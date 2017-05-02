@@ -2,13 +2,15 @@ package com.stardust.enhancedfloaty.sample;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.stardust.enhancedfloaty.FloatyService;
 import com.stardust.enhancedfloaty.R;
-import com.stardust.enhancedfloaty.ResizableExpandableFloatyService;
-import com.stardust.enhancedfloaty.ResizableFloatyService;
+import com.stardust.enhancedfloaty.ResizableExpandableFloatyWindow;
+import com.stardust.enhancedfloaty.ResizableFloatyWindow;
 import com.stardust.enhancedfloaty.util.FloatingWindowPermissionUtil;
 
 
@@ -23,25 +25,19 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FloatingWindowPermissionUtil.goToFloatingWindowPermissionSettingIfNeeded(this);
+        startService(new Intent(this, FloatyService.class));
         findViewById(R.id.resizable_floaty).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startFloaty(MainActivity.this);
+                FloatyService.addWindow(new ResizableFloatyWindow(new SampleFloaty()));
             }
         });
         findViewById(R.id.expandable_floaty).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startExpandableFloaty(MainActivity.this);
+                FloatyService.addWindow(new ResizableExpandableFloatyWindow(new SampleExpandableFloaty()));
             }
         });
     }
 
-    private static void startExpandableFloaty(Context ctx) {
-        ResizableExpandableFloatyService.startService(ctx, new SampleExpandableFloaty());
-    }
-
-    private static void startFloaty(Context ctx) {
-        ResizableFloatyService.startService(ctx, new SampleFloaty());
-    }
 }

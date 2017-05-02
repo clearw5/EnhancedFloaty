@@ -14,9 +14,9 @@ public abstract class ResizableExpandableFloaty {
     private float mCollapsedViewPressedAlpha = 1.0f;
     private boolean mShouldRequestFocusWhenExpand = true;
 
-    public abstract View inflateCollapsedView(ResizableExpandableFloatyService service);
+    public abstract View inflateCollapsedView(FloatyService service, ResizableExpandableFloatyWindow window);
 
-    public abstract View inflateExpandedView(ResizableExpandableFloatyService service);
+    public abstract View inflateExpandedView(FloatyService service, ResizableExpandableFloatyWindow window);
 
     @Nullable
     public View getResizerView(View expandedView) {

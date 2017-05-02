@@ -6,9 +6,10 @@ import android.support.annotation.Nullable;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 
+import com.stardust.enhancedfloaty.FloatyService;
 import com.stardust.enhancedfloaty.R;
 import com.stardust.enhancedfloaty.ResizableExpandableFloaty;
-import com.stardust.enhancedfloaty.ResizableExpandableFloatyService;
+import com.stardust.enhancedfloaty.ResizableExpandableFloatyWindow;
 
 /**
  * Created by Stardust on 2017/4/20.
@@ -24,7 +25,7 @@ public class SampleExpandableFloaty extends ResizableExpandableFloaty {
     }
 
     @Override
-    public View inflateCollapsedView(ResizableExpandableFloatyService service) {
+    public View inflateCollapsedView(FloatyService service, ResizableExpandableFloatyWindow window) {
         ensureContextWrapper(service);
         return View.inflate(mContextWrapper, R.layout.floating_window_collapsed, null);
     }
@@ -36,18 +37,18 @@ public class SampleExpandableFloaty extends ResizableExpandableFloaty {
     }
 
     @Override
-    public View inflateExpandedView(ResizableExpandableFloatyService service) {
+    public View inflateExpandedView(FloatyService service, ResizableExpandableFloatyWindow window) {
         ensureContextWrapper(service);
         View view = View.inflate(mContextWrapper, R.layout.floating_window_expanded, null);
-        setListeners(view, service);
+        setListeners(view, window);
         return view;
     }
 
-    private void setListeners(final View view, final ResizableExpandableFloatyService service) {
+    private void setListeners(final View view, final ResizableExpandableFloatyWindow window) {
         view.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                service.stopSelf();
+                window.close();
             }
         });
         view.findViewById(R.id.move_or_resize).setOnClickListener(new View.OnClickListener() {
@@ -65,7 +66,7 @@ public class SampleExpandableFloaty extends ResizableExpandableFloaty {
         view.findViewById(R.id.minimize).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                service.collapse();
+                window.collapse();
             }
         });
 

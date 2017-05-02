@@ -1,7 +1,11 @@
 EnhancedFloaty
 ===============
 
-一个支持拖曳、自动靠边、拖放调整大小的悬浮窗。
+一个支持拖曳、自动靠边、拖放调整大小、多窗口的悬浮窗。
+
+效果图：
+
+![screen-capture1](https://raw.githubusercontent.com/hyb1996/EnhancedFloaty/master/captures/ss01.png)
 
 ### Dependency
 
@@ -25,27 +29,12 @@ Add it in your root build.gradle at the end of repositories:
 
 ### Usage
 
-通过ResizableFloatyService的startService方法启动悬浮窗，并提供ViewSupplier来指定悬浮窗的View。为了保证ViewSupplier的可序列化，ViewSupplier必须是静态内部类或静态代码块的匿名类。
-```
-private static void startService(Context ctx) {
-    ResizableFloatyService.startService(ctx, new ResizableFloatyService.ViewSupplier() {
-        @Override
-        public View inflateCollapsedView(Context context) {
-            return View.inflate(context, R.layout.floating_window_collapsed, null);
-        }
+通过`context.startService(new Intent(context, FloatyService.class));`启动悬浮窗服务。 
+通过`FloatyService.addWindow(window);`来添加悬浮窗。 
+例如`FloatyService.addWindow(new ResizableFloatyWindow(new SampleFloaty()));`
 
-        @Override
-        public View inflateExpandedView(Context context) {
-            return View.inflate(context, R.layout.floating_window_expanded, null);
-        }
 
-        @Override
-        public View getResizerView(View expandedView) {
-            return expandedView.findViewById(R.id.resizer);
-        }
-    });
-}
-```
+更多用法参见Sample。
 
 ### License
 

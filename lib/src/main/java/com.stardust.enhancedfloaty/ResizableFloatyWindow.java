@@ -1,18 +1,10 @@
 package com.stardust.enhancedfloaty;
 
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.os.IBinder;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 
 import com.stardust.enhancedfloaty.gesture.DragGesture;
 import com.stardust.enhancedfloaty.gesture.ResizeGesture;
@@ -22,43 +14,40 @@ import com.stardust.lib.R;
  * Created by Stardust on 2017/4/30.
  */
 
-public class ResizableFloatyService extends Service {
+public class ResizableFloatyWindow implements FloatyWindow {
 
-    private static final String TAG = "ResizableFloatyService";
-    private static ResizableFloaty floaty;
-
-    public static void startService(Context ctx, ResizableFloaty floaty) {
-        ResizableFloatyService.floaty = floaty;
-        ctx.startService(new Intent(ctx, ResizableFloatyService.class));
-    }
-
+    private static final String TAG = "ResizableFloatyWindow";
 
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWindowLayoutParams;
-    private FrameLayout mWindowView;
+    private ViewGroup mWindowView;
     private View mView;
     private View mResizer;
     private View mMoveCursor;
     private WindowBridge mWindowBridge;
+    private ResizableFloaty mFloaty;
+
+    public ResizableFloatyWindow(ResizableFloaty floaty) {
+        mFloaty = floaty;
+    }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+    public void onCreate(FloatyService service, WindowManager manager) {
+        mWindowManager = manager;
         mWindowLayoutParams = createWindowLayoutParams();
-        if (floaty == null) {
-            throw new IllegalStateException("Must start this service by static method ResizableExpandableFloatyService.startService");
+        if (mFloaty == null) {
+            throw new IllegalStateException("Must start this service by static method ResizableExpandableFloatyWindow.startService");
         }
-        initWindowView();
+        initWindowView(service);
         mWindowBridge = new WindowBridge.DefaultImpl(mWindowLayoutParams, mWindowManager, mWindowView);
         initGesture();
     }
 
-    private void initWindowView() {
-        mWindowView = (FrameLayout) View.inflate(getApplicationContext(), R.layout.ef_floaty_container, null);
-        mView = floaty.inflateView(this);
-        mResizer = floaty.getResizerView(mView);
-        mMoveCursor = floaty.getMoveCursorView(mView);
+    private void initWindowView(FloatyService service) {
+        mWindowView = (ViewGroup) View.inflate(service, R.layout.ef_floaty_container, null);
+        mView = mFloaty.inflateView(service, this);
+        mResizer = mFloaty.getResizerView(mView);
+        mMoveCursor = mFloaty.getMoveCursorView(mView);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mWindowView.addView(mView, params);
         mWindowView.setFocusableInTouchMode(true);
@@ -86,16 +75,15 @@ public class ResizableFloatyService extends Service {
         }
     }
 
-    @Nullable
+
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public void onServiceDestroy(FloatyService service) {
+        close();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void close() {
         mWindowManager.removeView(mWindowView);
-        Log.v(TAG, "onDestroy");
+        FloatyService.removeWindow(this);
     }
 }
