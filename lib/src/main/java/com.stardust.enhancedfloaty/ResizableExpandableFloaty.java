@@ -7,56 +7,110 @@ import android.view.View;
  * Created by Stardust on 2017/4/19.
  */
 
-public abstract class ResizableExpandableFloaty {
+public interface ResizableExpandableFloaty {
 
-    private float mCollapsedHiddenWidthRadio = 0f;
-    private float mCollapsedViewUnpressedAlpha = 0.7f;
-    private float mCollapsedViewPressedAlpha = 1.0f;
-    private boolean mShouldRequestFocusWhenExpand = true;
 
-    public abstract View inflateCollapsedView(FloatyService service, ResizableExpandableFloatyWindow window);
+    View inflateCollapsedView(FloatyService service, ResizableExpandableFloatyWindow window);
 
-    public abstract View inflateExpandedView(FloatyService service, ResizableExpandableFloatyWindow window);
+    View inflateExpandedView(FloatyService service, ResizableExpandableFloatyWindow window);
 
     @Nullable
-    public View getResizerView(View expandedView) {
-        return null;
-    }
+    View getResizerView(View expandedView);
 
     @Nullable
-    public View getMoveCursorView(View expandedView) {
-        return null;
-    }
+    View getMoveCursorView(View expandedView);
 
-    public float getCollapsedHiddenWidthRadio() {
-        return mCollapsedHiddenWidthRadio;
-    }
+    float getCollapsedHiddenWidthRadio();
 
-    public void setCollapsedHiddenWidthRadio(float collapsedHiddenWidthRadio) {
-        this.mCollapsedHiddenWidthRadio = collapsedHiddenWidthRadio;
-    }
+    float getCollapsedViewUnpressedAlpha();
 
-    public float getCollapsedViewUnpressedAlpha() {
-        return mCollapsedViewUnpressedAlpha;
-    }
+    float getCollapsedViewPressedAlpha();
 
-    public void setCollapsedViewUnpressedAlpha(float collapsedViewUnpressedAlpha) {
-        mCollapsedViewUnpressedAlpha = collapsedViewUnpressedAlpha;
-    }
 
-    public float getCollapsedViewPressedAlpha() {
-        return mCollapsedViewPressedAlpha;
-    }
+    boolean shouldRequestFocusWhenExpand();
 
-    public void setCollapsedViewPressedAlpha(float collapsedViewPressedAlpha) {
-        mCollapsedViewPressedAlpha = collapsedViewPressedAlpha;
-    }
 
-    public boolean shouldRequestFocusWhenExpand() {
-        return mShouldRequestFocusWhenExpand;
-    }
+    int getInitialX();
 
-    public void setShouldRequestFocusWhenExpand(boolean requestFocusWhenExpand) {
-        mShouldRequestFocusWhenExpand = requestFocusWhenExpand;
+
+    int getInitialY();
+
+    boolean isInitialExpanded();
+
+    abstract class AbstarctResizableExpandableFloaty implements ResizableExpandableFloaty {
+        private float mCollapsedHiddenWidthRadio = 0f;
+        private float mCollapsedViewUnpressedAlpha = 0.7f;
+        private float mCollapsedViewPressedAlpha = 1.0f;
+        private boolean mShouldRequestFocusWhenExpand = true;
+        private int mInitialX;
+        private int mInitialY;
+        private boolean mInitialExpanded = false;
+
+        @Nullable
+        public View getResizerView(View expandedView) {
+            return null;
+        }
+
+        @Nullable
+        public View getMoveCursorView(View expandedView) {
+            return null;
+        }
+
+        public float getCollapsedHiddenWidthRadio() {
+            return mCollapsedHiddenWidthRadio;
+        }
+
+        public void setCollapsedHiddenWidthRadio(float collapsedHiddenWidthRadio) {
+            this.mCollapsedHiddenWidthRadio = collapsedHiddenWidthRadio;
+        }
+
+        public float getCollapsedViewUnpressedAlpha() {
+            return mCollapsedViewUnpressedAlpha;
+        }
+
+        public void setCollapsedViewUnpressedAlpha(float collapsedViewUnpressedAlpha) {
+            mCollapsedViewUnpressedAlpha = collapsedViewUnpressedAlpha;
+        }
+
+        public float getCollapsedViewPressedAlpha() {
+            return mCollapsedViewPressedAlpha;
+        }
+
+        public void setCollapsedViewPressedAlpha(float collapsedViewPressedAlpha) {
+            mCollapsedViewPressedAlpha = collapsedViewPressedAlpha;
+        }
+
+        public boolean shouldRequestFocusWhenExpand() {
+            return mShouldRequestFocusWhenExpand;
+        }
+
+        public void setShouldRequestFocusWhenExpand(boolean requestFocusWhenExpand) {
+            mShouldRequestFocusWhenExpand = requestFocusWhenExpand;
+        }
+
+
+        public int getInitialX() {
+            return mInitialX;
+        }
+
+        public void setInitialX(int initialX) {
+            mInitialX = initialX;
+        }
+
+        public int getInitialY() {
+            return mInitialY;
+        }
+
+        public void setInitialY(int initialY) {
+            mInitialY = initialY;
+        }
+
+        public boolean isInitialExpanded() {
+            return mInitialExpanded;
+        }
+
+        public void setInitialExpanded(boolean initialExpanded) {
+            mInitialExpanded = initialExpanded;
+        }
     }
 }

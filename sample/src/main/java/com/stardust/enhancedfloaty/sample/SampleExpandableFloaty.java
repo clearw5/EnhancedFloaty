@@ -15,7 +15,7 @@ import com.stardust.enhancedfloaty.ResizableExpandableFloatyWindow;
  * Created by Stardust on 2017/4/20.
  */
 
-public class SampleExpandableFloaty extends ResizableExpandableFloaty {
+public class SampleExpandableFloaty extends ResizableExpandableFloaty.AbstarctResizableExpandableFloaty {
 
     private ContextWrapper mContextWrapper;
     private View mResizer, mMoveCursor;

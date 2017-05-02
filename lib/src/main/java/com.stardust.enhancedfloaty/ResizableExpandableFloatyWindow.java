@@ -56,11 +56,28 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
         if (mFloaty == null) {
             throw new IllegalStateException("Must start this service by static method ResizableExpandableFloatyWindow.startService");
         }
-        mExpandedView = mFloaty.inflateExpandedView(service, this);
-        mCollapsedView = mFloaty.inflateCollapsedView(service, this);
-        mResizer = mFloaty.getResizerView(mExpandedView);
-        mMoveCursor = mFloaty.getMoveCursorView(mExpandedView);
+        inflateWindowViews(service);
         initWindowView(service);
+        initWindowBridge();
+        initGesture();
+        setKeyListener();
+        setInitialPosition();
+    }
+
+    private void setInitialPosition() {
+        boolean expand = mFloaty.isInitialExpanded();
+        if (expand) {
+            mExpandedViewX = mFloaty.getInitialX();
+            mExpandedViewY = mFloaty.getInitialY();
+            expand();
+        } else {
+            mCollapsedViewX = mFloaty.getInitialX();
+            mCollapsedViewY = mFloaty.getInitialY();
+            mWindowBridge.updatePosition(mCollapsedViewX, mCollapsedViewY);
+        }
+    }
+
+    private void initWindowBridge() {
         mWindowBridge = new WindowBridge.DefaultImpl(mWindowLayoutParams, mWindowManager, mWindowView) {
             @Override
             public void updatePosition(int x, int y) {
@@ -75,8 +92,13 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
             }
 
         };
-        initGesture();
-        setKeyListener();
+    }
+
+    private void inflateWindowViews(FloatyService service) {
+        mExpandedView = mFloaty.inflateExpandedView(service, this);
+        mCollapsedView = mFloaty.inflateCollapsedView(service, this);
+        mResizer = mFloaty.getResizerView(mExpandedView);
+        mMoveCursor = mFloaty.getMoveCursorView(mExpandedView);
     }
 
     private WindowManager.LayoutParams createWindowLayoutParams() {

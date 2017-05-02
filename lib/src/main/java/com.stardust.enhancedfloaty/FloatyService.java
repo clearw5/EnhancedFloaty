@@ -6,7 +6,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by Stardust on 2017/5/1.
@@ -14,8 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FloatyService extends Service {
 
-
-    public static CopyOnWriteArrayList<FloatyWindow> windows = new CopyOnWriteArrayList<>();
+    private static CopyOnWriteArraySet<FloatyWindow> windows = new CopyOnWriteArraySet<>();
 
     public static void addWindow(FloatyWindow window) {
         windows.add(window);
