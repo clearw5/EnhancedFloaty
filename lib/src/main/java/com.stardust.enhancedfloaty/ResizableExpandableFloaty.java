@@ -35,6 +35,10 @@ public interface ResizableExpandableFloaty {
 
     int getInitialY();
 
+    int getInitialHeight();
+
+    int getInitialWidth();
+
     boolean isInitialExpanded();
 
     abstract class AbstractResizableExpandableFloaty implements ResizableExpandableFloaty {
@@ -45,6 +49,8 @@ public interface ResizableExpandableFloaty {
         private int mInitialX;
         private int mInitialY;
         private boolean mInitialExpanded = false;
+        private int mInitialHeight;
+        private int mInitialWidth;
 
         @Nullable
         public View getResizerView(View expandedView) {
@@ -111,6 +117,24 @@ public interface ResizableExpandableFloaty {
 
         public void setInitialExpanded(boolean initialExpanded) {
             mInitialExpanded = initialExpanded;
+        }
+
+        @Override
+        public int getInitialHeight() {
+            return mInitialHeight;
+        }
+
+        public void setInitialHeight(int initialHeight) {
+            mInitialHeight = initialHeight;
+        }
+
+        @Override
+        public int getInitialWidth() {
+            return mInitialWidth;
+        }
+
+        public void setInitialWidth(int initialWidth) {
+            mInitialWidth = initialWidth;
         }
     }
 }

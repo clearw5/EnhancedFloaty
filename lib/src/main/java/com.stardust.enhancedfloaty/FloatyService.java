@@ -17,8 +17,7 @@ public class FloatyService extends Service {
     private static CopyOnWriteArraySet<FloatyWindow> windows = new CopyOnWriteArraySet<>();
 
     public static void addWindow(FloatyWindow window) {
-        windows.add(window);
-        if (instance != null) {
+        if ( instance != null && windows.add(window)){
             window.onCreate(instance, instance.mWindowManager);
         }
     }

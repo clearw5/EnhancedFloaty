@@ -61,10 +61,10 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
         initWindowBridge();
         initGesture();
         setKeyListener();
-        setInitialPosition();
+        setInitialState();
     }
 
-    private void setInitialPosition() {
+    private void setInitialState() {
         boolean expand = mFloaty.isInitialExpanded();
         if (expand) {
             mExpandedViewX = mFloaty.getInitialX();
