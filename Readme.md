@@ -5,7 +5,7 @@ EnhancedFloaty
 
 效果图：
 
-![screen-capture1](https://raw.githubusercontent.com/hyb1996/EnhancedFloaty/master/captures/ss01.png)
+![screen-capture1](https://raw.githubusercontent.com/hyb1996/EnhancedFloaty/master/screen-captures/ss01.png)
 
 ### Dependency
 
@@ -23,7 +23,7 @@ Add it in your root build.gradle at the end of repositories:
 #### Step 2. Add the dependency
 ```
     dependencies {
-            compile 'com.github.hyb1996:EnhancedFloaty:0.1'
+            compile 'com.github.hyb1996:EnhancedFloaty:0.13'
     }
 ```
 
