@@ -18,7 +18,7 @@ import com.stardust.widget.ViewSwitcher;
 
 public class ResizableExpandableFloatyWindow implements FloatyWindow {
 
-    private static final int INITIAL_WINDOW_PARAM_FLAG = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+    private static final int INITIAL_WINDOW_PARAM_FLAG = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
     private static final String TAG = "ExpandableFloatyService";
 
 
@@ -154,7 +154,8 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
 
     public void collapse() {
         mCollapseExpandViewSwitcher.showFirst();
-        disableWindowFocusAndWindowLimit();
+        disableWindowFocus();
+        setWindowLayoutNoLimit();
         mDragGesture.setKeepToSide(true);
         mWindowBridge.updatePosition(mCollapsedViewX, mCollapsedViewY);
     }
@@ -191,8 +192,14 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
         collapse();
     }
 
-    public void disableWindowFocusAndWindowLimit() {
-        mWindowLayoutParams.flags = INITIAL_WINDOW_PARAM_FLAG;
+
+    public void disableWindowFocus() {
+        mWindowLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
+    }
+
+    public void setWindowLayoutInScreen() {
+        mWindowLayoutParams.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
     }
 
@@ -202,8 +209,8 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
         mWindowView.requestFocus();
     }
 
-    public void enableWindowLimit() {
-        mWindowLayoutParams.flags &= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+    public void setWindowLayoutNoLimit() {
+        mWindowLayoutParams.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mWindowManager.updateViewLayout(mWindowView, mWindowLayoutParams);
     }
 

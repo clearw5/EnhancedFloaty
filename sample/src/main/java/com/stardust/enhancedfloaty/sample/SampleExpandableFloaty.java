@@ -63,7 +63,7 @@ public class SampleExpandableFloaty extends ResizableExpandableFloaty.AbstractRe
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     editText.setText("");
-                    window.disableWindowFocusAndWindowLimit();
+                    window.disableWindowFocus();
                     return true;
                 }
                 return false;
