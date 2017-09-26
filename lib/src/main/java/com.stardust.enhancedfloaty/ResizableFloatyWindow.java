@@ -71,7 +71,8 @@ public class ResizableFloatyWindow implements FloatyWindow {
             ResizeGesture.enableResize(mResizer, mView, mWindowBridge);
         }
         if (mMoveCursor != null) {
-            DragGesture.enableDrag(mMoveCursor, mWindowBridge, 1.0f, 1.0f);
+            DragGesture gesture = new DragGesture(mWindowBridge, mMoveCursor);
+            gesture.setPressedAlpha(1.0f);
         }
     }
 

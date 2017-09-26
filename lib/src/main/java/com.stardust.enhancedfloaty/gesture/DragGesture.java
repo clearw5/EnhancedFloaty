@@ -13,36 +13,6 @@ import com.stardust.enhancedfloaty.WindowBridge;
 
 public class DragGesture extends GestureDetector.SimpleOnGestureListener {
 
-    public static DragGesture enableDrag(final View view, WindowBridge bridge, final float pressedAlpha, final float unpressedAlpha) {
-        final DragGesture gestureListener = new DragGesture(bridge, view) {
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                view.setAlpha(pressedAlpha);
-                return super.onScroll(e1, e2, distanceX, distanceY);
-            }
-
-        };
-        final GestureDetectorCompat gestureDetector = new GestureDetectorCompat(view.getContext(), gestureListener);
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                gestureDetector.onTouchEvent(event);
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    view.setAlpha(unpressedAlpha);
-                    if (!gestureListener.mFlung && gestureListener.isKeepToSide()) {
-                        gestureListener.keepToSide();
-                    }
-                }
-                return true;
-            }
-        });
-        return gestureListener;
-    }
-
-    public static DragGesture enableDrag(final View view, WindowBridge bridge) {
-        return enableDrag(view, bridge, 1.0f, 0.77f);
-    }
-
     protected WindowBridge mWindowBridge;
     protected View mView;
 
@@ -54,10 +24,46 @@ public class DragGesture extends GestureDetector.SimpleOnGestureListener {
     private View.OnClickListener mOnClickListener;
     private boolean mFlung = false;
     private boolean mKeepToSide;
+    private float mPressedAlpha = 0.7f;
+    private float mUnpressedAlpha = 1.0f;
 
     public DragGesture(WindowBridge windowBridge, View view) {
         mWindowBridge = windowBridge;
         mView = view;
+        setupView();
+    }
+
+    private void setupView() {
+        final GestureDetectorCompat gestureDetector = new GestureDetectorCompat(mView.getContext(), this);
+        mView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                gestureDetector.onTouchEvent(event);
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    mView.setAlpha(mUnpressedAlpha);
+                    if (!mFlung && isKeepToSide()) {
+                        keepToSide();
+                    }
+                }
+                return true;
+            }
+        });
+    }
+
+    public float getPressedAlpha() {
+        return mPressedAlpha;
+    }
+
+    public void setPressedAlpha(float pressedAlpha) {
+        mPressedAlpha = pressedAlpha;
+    }
+
+    public float getUnpressedAlpha() {
+        return mUnpressedAlpha;
+    }
+
+    public void setUnpressedAlpha(float unpressedAlpha) {
+        mUnpressedAlpha = unpressedAlpha;
     }
 
     public void setKeepToSide(boolean keepToSide) {
@@ -90,6 +96,7 @@ public class DragGesture extends GestureDetector.SimpleOnGestureListener {
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         mWindowBridge.updatePosition(mInitialX + (int) ((e2.getRawX() - mInitialTouchX)),
                 mInitialY + (int) ((e2.getRawY() - mInitialTouchY)));
+        mView.setAlpha(mPressedAlpha);
         return false;
     }
 

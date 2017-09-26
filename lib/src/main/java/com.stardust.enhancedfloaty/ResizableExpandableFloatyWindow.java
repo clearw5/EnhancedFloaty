@@ -129,9 +129,12 @@ public class ResizableExpandableFloatyWindow implements FloatyWindow {
             mResizeGesture = ResizeGesture.enableResize(mResizer, mExpandedView, mWindowBridge);
         }
         if (mMoveCursor != null) {
-            DragGesture.enableDrag(mMoveCursor, mWindowBridge, 1.0f, 1.0f);
+            DragGesture gesture = new DragGesture(mWindowBridge, mMoveCursor);
+            gesture.setPressedAlpha(1.0f);
         }
-        mDragGesture = DragGesture.enableDrag(mCollapsedView, mWindowBridge, mFloaty.getCollapsedViewPressedAlpha(), mFloaty.getCollapsedViewUnpressedAlpha());
+        mDragGesture = new DragGesture(mWindowBridge, mCollapsedView);
+        mDragGesture.setUnpressedAlpha(mFloaty.getCollapsedViewUnpressedAlpha());
+        mDragGesture.setPressedAlpha(mFloaty.getCollapsedViewPressedAlpha());
         mDragGesture.setKeepToSide(true);
         mDragGesture.setKeepToSideHiddenWidthRadio(mFloaty.getCollapsedHiddenWidthRadio());
         mDragGesture.setOnDraggedViewClickListener(new View.OnClickListener() {
