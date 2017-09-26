@@ -43,18 +43,17 @@ public class DragGesture extends GestureDetector.SimpleOnGestureListener {
         return enableDrag(view, bridge, 1.0f, 0.77f);
     }
 
-        private WindowBridge mWindowBridge;
-    private boolean mKeepToSide;
-    private View.OnClickListener mOnClickListener;
-    private View mView;
+    protected WindowBridge mWindowBridge;
+    protected View mView;
 
+    private float mKeepToSideHiddenWidthRadio = 0.5f;
     private int mInitialX;
     private int mInitialY;
     private float mInitialTouchX;
     private float mInitialTouchY;
-    private float mKeepToSideHiddenWidthRadio = 0.5f;
-
+    private View.OnClickListener mOnClickListener;
     private boolean mFlung = false;
+    private boolean mKeepToSide;
 
     public DragGesture(WindowBridge windowBridge, View view) {
         mWindowBridge = windowBridge;
@@ -71,6 +70,10 @@ public class DragGesture extends GestureDetector.SimpleOnGestureListener {
 
     public void setKeepToSideHiddenWidthRadio(float keepToSideHiddenWidthRadio) {
         mKeepToSideHiddenWidthRadio = keepToSideHiddenWidthRadio;
+    }
+
+    public float getKeepToSideHiddenWidthRadio() {
+        return mKeepToSideHiddenWidthRadio;
     }
 
     @Override
