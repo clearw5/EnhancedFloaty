@@ -76,6 +76,9 @@ public class ResizableFloatyWindow implements FloatyWindow {
         }
     }
 
+    public WindowBridge getWindowBridge() {
+        return mWindowBridge;
+    }
 
     @Override
     public void onServiceDestroy(FloatyService service) {
