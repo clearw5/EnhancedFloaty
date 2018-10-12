@@ -71,16 +71,69 @@ public class ResizableExpandableFloatyWindow extends FloatyWindow {
         setInitialState();
     }
 
-    private void setInitialState() {
-        boolean expand = mFloaty.isInitialExpanded();
+    public View getCollapsedView() {
+        return mCollapsedView;
+    }
+
+    public View getExpandedView() {
+        return mExpandedView;
+    }
+
+    public View getResizer() {
+        return mResizer;
+    }
+
+    public View getMoveCursor() {
+        return mMoveCursor;
+    }
+
+    protected ViewStack getViewStack() {
+        return mViewStack;
+    }
+
+    protected int getCollapsedViewX() {
+        return mCollapsedViewX;
+    }
+
+    protected void setCollapsedViewX(int collapsedViewX) {
+        mCollapsedViewX = collapsedViewX;
+    }
+
+    protected int getCollapsedViewY() {
+        return mCollapsedViewY;
+    }
+
+    protected void setCollapsedViewY(int collapsedViewY) {
+        mCollapsedViewY = collapsedViewY;
+    }
+
+    protected int getExpandedViewX() {
+        return mExpandedViewX;
+    }
+
+    protected void setExpandedViewX(int expandedViewX) {
+        mExpandedViewX = expandedViewX;
+    }
+
+    protected int getExpandedViewY() {
+        return mExpandedViewY;
+    }
+
+    protected void setExpandedViewY(int expandedViewY) {
+        mExpandedViewY = expandedViewY;
+    }
+
+    protected void setInitialState() {
+        ResizableExpandableFloaty floaty = getFloaty();
+        boolean expand = floaty.isInitialExpanded();
         if (expand) {
-            mExpandedViewX = mFloaty.getInitialX();
-            mExpandedViewY = mFloaty.getInitialY();
+            setExpandedViewX(floaty.getInitialX());
+            setExpandedViewY(floaty.getInitialY());
             expand();
         } else {
-            mCollapsedViewX = mFloaty.getInitialX();
-            mCollapsedViewY = mFloaty.getInitialY();
-            getWindowBridge().updatePosition(mCollapsedViewX, mCollapsedViewY);
+            setCollapsedViewX(floaty.getInitialX());
+            setCollapsedViewX(floaty.getInitialY());
+            getWindowBridge().updatePosition(getCollapsedViewX(), getCollapsedViewY());
         }
     }
 
@@ -90,12 +143,12 @@ public class ResizableExpandableFloatyWindow extends FloatyWindow {
             @Override
             public void updatePosition(int x, int y) {
                 super.updatePosition(x, y);
-                if (mCollapseExpandViewSwitcher.getCurrentView() == mExpandedView) {
-                    mExpandedViewX = x;
-                    mExpandedViewY = y;
+                if (getViewSwitcher().getCurrentView() == getExpandedView()) {
+                    setExpandedViewX(x);
+                    setExpandedViewY(y);
                 } else {
-                    mCollapsedViewX = x;
-                    mCollapsedViewY = y;
+                    setCollapsedViewX(x);
+                    setCollapsedViewY(y);
                 }
             }
 
@@ -103,10 +156,11 @@ public class ResizableExpandableFloatyWindow extends FloatyWindow {
     }
 
     protected void inflateWindowViews(FloatyService service) {
-        mExpandedView = mFloaty.inflateExpandedView(service, this);
-        mCollapsedView = mFloaty.inflateCollapsedView(service, this);
-        mResizer = mFloaty.getResizerView(mExpandedView);
-        mMoveCursor = mFloaty.getMoveCursorView(mExpandedView);
+        ResizableExpandableFloaty floaty = getFloaty();
+        mExpandedView = floaty.inflateExpandedView(service, this);
+        mCollapsedView = floaty.inflateCollapsedView(service, this);
+        mResizer = floaty.getResizerView(getExpandedView());
+        mMoveCursor = floaty.getMoveCursorView(getExpandedView());
     }
 
     protected WindowManager.LayoutParams onCreateWindowLayoutParams() {
@@ -120,46 +174,71 @@ public class ResizableExpandableFloatyWindow extends FloatyWindow {
         return layoutParams;
     }
 
-    private void initGesture() {
-        if (mResizer != null) {
-           ResizeGesture.enableResize(mResizer, mExpandedView, getWindowBridge());
+    protected void initGesture() {
+        enableResize();
+        enableMove();
+    }
+
+    protected void enableResize() {
+        if (getResizer() != null) {
+            ResizeGesture.enableResize(getResizer(), getExpandedView(), getWindowBridge());
         }
-        if (mMoveCursor != null) {
-            DragGesture gesture = new DragGesture(getWindowBridge(), mMoveCursor);
+    }
+
+    public ResizableExpandableFloaty getFloaty() {
+        return mFloaty;
+    }
+
+    protected void enableMove() {
+        if (getMoveCursor() != null) {
+            DragGesture gesture = new DragGesture(getWindowBridge(), getMoveCursor());
             gesture.setPressedAlpha(1.0f);
         }
-        mDragGesture = new DragGesture(getWindowBridge(), mCollapsedView);
-        mDragGesture.setUnpressedAlpha(mFloaty.getCollapsedViewUnpressedAlpha());
-        mDragGesture.setPressedAlpha(mFloaty.getCollapsedViewPressedAlpha());
-        mDragGesture.setKeepToSide(true);
-        mDragGesture.setKeepToSideHiddenWidthRadio(mFloaty.getCollapsedHiddenWidthRadio());
-        mDragGesture.setOnDraggedViewClickListener(new View.OnClickListener() {
+        DragGesture dragGesture = new DragGesture(getWindowBridge(), getCollapsedView());
+        dragGesture.setUnpressedAlpha(getFloaty().getCollapsedViewUnpressedAlpha());
+        dragGesture.setPressedAlpha(getFloaty().getCollapsedViewPressedAlpha());
+        dragGesture.setKeepToSide(true);
+        dragGesture.setKeepToSideHiddenWidthRadio(getFloaty().getCollapsedHiddenWidthRadio());
+        dragGesture.setOnDraggedViewClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 expand();
             }
         });
+        setDragGesture(dragGesture);
+    }
+
+    protected void setDragGesture(DragGesture dragGesture) {
+        mDragGesture = dragGesture;
+    }
+
+    protected DragGesture getDragGesture() {
+        return mDragGesture;
     }
 
     public void expand() {
-        mCollapseExpandViewSwitcher.showSecond();
+        getViewSwitcher().showSecond();
         //enableWindowLimit();
-        if (mFloaty.shouldRequestFocusWhenExpand()) {
+        if (getFloaty().shouldRequestFocusWhenExpand()) {
             requestWindowFocus();
         }
-        mDragGesture.setKeepToSide(false);
-        getWindowBridge().updatePosition(mExpandedViewX, mExpandedViewY);
+        getDragGesture().setKeepToSide(false);
+        getWindowBridge().updatePosition(getExpandedViewX(), getExpandedViewY());
+    }
+
+    protected ViewSwitcher getViewSwitcher() {
+        return mCollapseExpandViewSwitcher;
     }
 
     public void collapse() {
-        mCollapseExpandViewSwitcher.showFirst();
+        getViewSwitcher().showFirst();
         disableWindowFocus();
         setWindowLayoutNoLimit();
-        mDragGesture.setKeepToSide(true);
-        getWindowBridge().updatePosition(mCollapsedViewX, mCollapsedViewY);
+        getDragGesture().setKeepToSide(true);
+        getWindowBridge().updatePosition(getCollapsedViewX(), getCollapsedViewY());
     }
 
-    private void setKeyListener() {
+    protected void setKeyListener() {
         getWindowView().setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -179,15 +258,16 @@ public class ResizableExpandableFloatyWindow extends FloatyWindow {
     }
 
     private void onBackPressed() {
-        if (mViewStack.canGoBack()) {
-            mViewStack.goBack();
+        ViewStack viewStack = getViewStack();
+        if (viewStack.canGoBack()) {
+            viewStack.goBack();
         } else {
             collapse();
         }
     }
 
     private void onHomePressed() {
-        mViewStack.goBackToFirst();
+        getViewStack().goBackToFirst();
         collapse();
     }
 
@@ -200,7 +280,7 @@ public class ResizableExpandableFloatyWindow extends FloatyWindow {
 
     public void setWindowLayoutInScreen() {
         WindowManager.LayoutParams windowLayoutParams = getWindowLayoutParams();
-        windowLayoutParams.flags|= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        windowLayoutParams.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         updateWindowLayoutParams(windowLayoutParams);
     }
 

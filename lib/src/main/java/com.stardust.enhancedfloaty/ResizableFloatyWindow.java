@@ -68,6 +68,17 @@ public class ResizableFloatyWindow extends FloatyWindow {
         return layoutParams;
     }
 
+    public View getRootView() {
+        return mView;
+    }
+
+    public View getResizer() {
+        return mResizer;
+    }
+
+    public View getMoveCursor() {
+        return mMoveCursor;
+    }
 
     private void initGesture() {
         if (mResizer != null) {
