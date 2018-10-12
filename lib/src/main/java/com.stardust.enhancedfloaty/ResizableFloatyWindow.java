@@ -1,5 +1,6 @@
 package com.stardust.enhancedfloaty;
 
+import android.content.Context;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
 import android.view.View;
@@ -8,57 +9,59 @@ import android.view.WindowManager;
 
 import com.stardust.enhancedfloaty.gesture.DragGesture;
 import com.stardust.enhancedfloaty.gesture.ResizeGesture;
+import com.stardust.enhancedfloaty.util.FloatingWindowPermissionUtil;
+import com.stardust.enhancedfloaty.util.WindowTypeCompat;
 import com.stardust.lib.R;
 
 /**
  * Created by Stardust on 2017/4/30.
  */
 
-public class ResizableFloatyWindow implements FloatyWindow {
+public class ResizableFloatyWindow extends FloatyWindow {
 
     private static final String TAG = "ResizableFloatyWindow";
 
-    private WindowManager mWindowManager;
-    private WindowManager.LayoutParams mWindowLayoutParams;
-    private ViewGroup mWindowView;
     private View mView;
     private View mResizer;
     private View mMoveCursor;
-    private WindowBridge mWindowBridge;
     private ResizableFloaty mFloaty;
 
     public ResizableFloatyWindow(ResizableFloaty floaty) {
+        if (floaty == null) {
+            throw new NullPointerException("floaty == null");
+        }
         mFloaty = floaty;
     }
 
     @Override
     public void onCreate(FloatyService service, WindowManager manager) {
-        mWindowManager = manager;
-        mWindowLayoutParams = createWindowLayoutParams();
-        if (mFloaty == null) {
-            throw new IllegalStateException("Must start this service by static method ResizableExpandableFloatyWindow.startService");
-        }
-        initWindowView(service);
-        mWindowBridge = new WindowBridge.DefaultImpl(mWindowLayoutParams, mWindowManager, mWindowView);
-        initGesture();
+        super.onCreate(service, manager);
     }
 
-    private void initWindowView(FloatyService service) {
-        mWindowView = (ViewGroup) View.inflate(service, R.layout.ef_floaty_container, null);
+    @Override
+    protected View onCreateView(FloatyService service) {
+        Context context = service.getApplicationContext();
+        ViewGroup windowView = (ViewGroup) View.inflate(context, R.layout.ef_floaty_container, null);
         mView = mFloaty.inflateView(service, this);
         mResizer = mFloaty.getResizerView(mView);
         mMoveCursor = mFloaty.getMoveCursorView(mView);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mWindowView.addView(mView, params);
-        mWindowView.setFocusableInTouchMode(true);
-        mWindowManager.addView(mWindowView, mWindowLayoutParams);
+        windowView.addView(mView, params);
+        windowView.setFocusableInTouchMode(true);
+        return windowView;
     }
 
-    private WindowManager.LayoutParams createWindowLayoutParams() {
+    @Override
+    protected void onViewCreated(View view) {
+        super.onViewCreated(view);
+        initGesture();
+    }
+
+    protected WindowManager.LayoutParams onCreateWindowLayoutParams() {
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowTypeCompat.getPhoneWindowType(),
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 PixelFormat.TRANSLUCENT);
         layoutParams.gravity = Gravity.TOP | Gravity.START;
@@ -68,26 +71,12 @@ public class ResizableFloatyWindow implements FloatyWindow {
 
     private void initGesture() {
         if (mResizer != null) {
-            ResizeGesture.enableResize(mResizer, mView, mWindowBridge);
+            ResizeGesture.enableResize(mResizer, mView, getWindowBridge());
         }
         if (mMoveCursor != null) {
-            DragGesture gesture = new DragGesture(mWindowBridge, mMoveCursor);
+            DragGesture gesture = new DragGesture(getWindowBridge(), mMoveCursor);
             gesture.setPressedAlpha(1.0f);
         }
     }
 
-    public WindowBridge getWindowBridge() {
-        return mWindowBridge;
-    }
-
-    @Override
-    public void onServiceDestroy(FloatyService service) {
-        close();
-    }
-
-    @Override
-    public void close() {
-        mWindowManager.removeView(mWindowView);
-        FloatyService.removeWindow(this);
-    }
 }
